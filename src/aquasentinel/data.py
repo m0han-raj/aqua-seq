@@ -92,9 +92,7 @@ def validate_schema(frame: pd.DataFrame) -> None:
 
     target_values = set(frame[config.RAW_TARGET].dropna().unique().tolist())
     if not target_values <= {0, 1}:
-        raise SchemaError(
-            f"{config.RAW_TARGET} must be binary 0/1, found {sorted(target_values)}."
-        )
+        raise SchemaError(f"{config.RAW_TARGET} must be binary 0/1, found {sorted(target_values)}.")
     if frame[config.RAW_TARGET].isna().any():
         raise SchemaError(f"{config.RAW_TARGET} contains missing values.")
 

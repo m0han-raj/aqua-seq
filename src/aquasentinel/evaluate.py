@@ -10,9 +10,9 @@ recessive, and bar charts are directly labelled.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Sequence
 
 import matplotlib
 
@@ -319,8 +319,12 @@ def plot_roc_curves(curves: dict[str, tuple[np.ndarray, np.ndarray]], name: str)
     for i, (label, (y_true, y_score)) in enumerate(curves.items()):
         fpr, tpr, _ = roc_curve(np.asarray(y_true).astype(int), y_score)
         auc = roc_auc_score(np.asarray(y_true).astype(int), y_score)
-        ax.plot(fpr, tpr, color=SERIES_COLORS[i % len(SERIES_COLORS)], label=f"{label} (AUC {auc:.3f})")
-    ax.plot([0, 1], [0, 1], color=INK_MUTED, linestyle="--", linewidth=1.2, label="Chance (AUC 0.500)")
+        ax.plot(
+            fpr, tpr, color=SERIES_COLORS[i % len(SERIES_COLORS)], label=f"{label} (AUC {auc:.3f})"
+        )
+    ax.plot(
+        [0, 1], [0, 1], color=INK_MUTED, linestyle="--", linewidth=1.2, label="Chance (AUC 0.500)"
+    )
     ax.set_xlabel("False positive rate (safe samples flagged unsafe)")
     ax.set_ylabel("True positive rate (unsafe samples caught)")
     ax.set_title("AquaSentinel - ROC curves, UNSAFE as positive class")
@@ -349,7 +353,12 @@ def plot_pr_curves(
         y_true = np.asarray(y_true).astype(int)
         precision, recall, _ = precision_recall_curve(y_true, y_score)
         ap = average_precision_score(y_true, y_score)
-        ax.plot(recall, precision, color=SERIES_COLORS[i % len(SERIES_COLORS)], label=f"{label} (AP {ap:.3f})")
+        ax.plot(
+            recall,
+            precision,
+            color=SERIES_COLORS[i % len(SERIES_COLORS)],
+            label=f"{label} (AP {ap:.3f})",
+        )
     ax.axhline(
         prevalence,
         color=INK_MUTED,
@@ -408,9 +417,7 @@ def plot_confusion_matrix(
     return save_figure(fig, name)
 
 
-def plot_threshold_tradeoff(
-    sweep: pd.DataFrame, chosen: ThresholdChoice, name: str
-) -> Path:
+def plot_threshold_tradeoff(sweep: pd.DataFrame, chosen: ThresholdChoice, name: str) -> Path:
     """Plot recall, precision and flag rate against the decision threshold.
 
     Args:
@@ -423,8 +430,15 @@ def plot_threshold_tradeoff(
     """
     apply_style()
     fig, ax = plt.subplots(figsize=(7.5, 5))
-    ax.plot(sweep["threshold"], sweep["recall_unsafe"], color=SERIES_COLORS[0], label="Recall on UNSAFE")
-    ax.plot(sweep["threshold"], sweep["precision_unsafe"], color=SERIES_COLORS[1], label="Precision on UNSAFE")
+    ax.plot(
+        sweep["threshold"], sweep["recall_unsafe"], color=SERIES_COLORS[0], label="Recall on UNSAFE"
+    )
+    ax.plot(
+        sweep["threshold"],
+        sweep["precision_unsafe"],
+        color=SERIES_COLORS[1],
+        label="Precision on UNSAFE",
+    )
     ax.plot(
         sweep["threshold"],
         sweep["flag_rate"],
@@ -432,10 +446,19 @@ def plot_threshold_tradeoff(
         linestyle=":",
         label="Share of all samples flagged for lab testing",
     )
-    ax.axhline(chosen.target_recall, color=INK_MUTED, linestyle="--", linewidth=1.2,
-               label=f"Recall target ({chosen.target_recall:.2f})")
-    ax.axvline(chosen.threshold, color=INK_PRIMARY, linewidth=1.5,
-               label=f"Chosen threshold ({chosen.threshold:.3f})")
+    ax.axhline(
+        chosen.target_recall,
+        color=INK_MUTED,
+        linestyle="--",
+        linewidth=1.2,
+        label=f"Recall target ({chosen.target_recall:.2f})",
+    )
+    ax.axvline(
+        chosen.threshold,
+        color=INK_PRIMARY,
+        linewidth=1.5,
+        label=f"Chosen threshold ({chosen.threshold:.3f})",
+    )
     ax.set_xlabel("Decision threshold on predicted P(UNSAFE)")
     ax.set_ylabel("Rate")
     ax.set_ylim(0, 1.02)
@@ -463,7 +486,9 @@ def plot_calibration(
         np.asarray(y_true).astype(int), np.clip(y_score, 0, 1), n_bins=10, strategy="quantile"
     )
     fig, ax = plt.subplots(figsize=(6, 5.5))
-    ax.plot([0, 1], [0, 1], color=INK_MUTED, linestyle="--", linewidth=1.2, label="Perfectly calibrated")
+    ax.plot(
+        [0, 1], [0, 1], color=INK_MUTED, linestyle="--", linewidth=1.2, label="Perfectly calibrated"
+    )
     ax.plot(prob_pred, prob_true, color=SERIES_COLORS[0], marker="o", markersize=8, label=label)
     ax.set_xlabel("Mean predicted P(UNSAFE)")
     ax.set_ylabel("Observed fraction UNSAFE")
@@ -473,10 +498,15 @@ def plot_calibration(
 
 
 def plot_model_comparison(frame: pd.DataFrame, name: str) -> Path:
-    """Plot a bar chart of cross-validated ROC-AUC with standard-deviation error bars.
+    """Plot cross-validated ROC-AUC per model with standard-deviation error bars.
+
+    Drawn as a dot plot rather than bars: the meaningful floor for ROC-AUC is 0.5
+    (chance), not 0, so a bar whose length is read from zero would misstate the
+    differences. Colour encodes what a row *is* (tuned model vs. baseline), never its
+    rank, so the palette does not shift when the ordering changes.
 
     Args:
-        frame: Columns ``model``, ``cv_roc_auc_mean``, ``cv_roc_auc_std``.
+        frame: Columns ``model``, ``kind``, ``cv_roc_auc_mean``, ``cv_roc_auc_std``.
         name: Figure file stem.
 
     Returns:
@@ -484,27 +514,68 @@ def plot_model_comparison(frame: pd.DataFrame, name: str) -> Path:
     """
     apply_style()
     ordered = frame.sort_values("cv_roc_auc_mean")
-    fig, ax = plt.subplots(figsize=(8, 0.62 * len(ordered) + 2.2))
+    fig, ax = plt.subplots(figsize=(8.4, 0.58 * len(ordered) + 2.2))
     positions = np.arange(len(ordered))
-    colors = [SERIES_COLORS[i % len(SERIES_COLORS)] for i in range(len(ordered))]
-    ax.barh(
-        positions,
-        ordered["cv_roc_auc_mean"],
-        xerr=ordered["cv_roc_auc_std"],
-        color=colors,
-        height=0.62,
-        error_kw={"ecolor": INK_SECONDARY, "elinewidth": 1.2, "capsize": 3},
-    )
-    ax.axvline(0.5, color=INK_MUTED, linestyle="--", linewidth=1.2)
-    ax.text(0.5, len(ordered) - 0.35, " chance", color=INK_MUTED, fontsize=9, va="center")
-    for pos, (mean, std) in enumerate(
-        zip(ordered["cv_roc_auc_mean"], ordered["cv_roc_auc_std"])
+
+    kind_color = {"model": SERIES_COLORS[0], "baseline": SERIES_COLORS[1]}
+    kinds = ordered["kind"].tolist() if "kind" in ordered else ["model"] * len(ordered)
+    colors = [kind_color.get(k, SERIES_COLORS[0]) for k in kinds]
+
+    for pos, (mean, std, color) in enumerate(
+        zip(ordered["cv_roc_auc_mean"], ordered["cv_roc_auc_std"], colors, strict=True)
     ):
-        ax.text(mean + std + 0.012, pos, f"{mean:.3f} ± {std:.3f}", va="center",
-                fontsize=9, color=INK_PRIMARY)
+        ax.hlines(pos, 0.5, mean, color=color, linewidth=2.0, alpha=0.45)
+        ax.errorbar(
+            mean,
+            pos,
+            xerr=std,
+            fmt="o",
+            markersize=9,
+            color=color,
+            ecolor=INK_SECONDARY,
+            elinewidth=1.2,
+            capsize=3,
+            markeredgecolor=SURFACE,
+            markeredgewidth=1.5,
+        )
+        ax.text(
+            mean + std + 0.008,
+            pos,
+            f"{mean:.3f} ± {std:.3f}",
+            va="center",
+            fontsize=9,
+            color=INK_PRIMARY,
+        )
+
+    ax.axvline(0.5, color=INK_MUTED, linestyle="--", linewidth=1.2)
+    ax.text(0.5, -0.85, "chance (0.5)", color=INK_MUTED, fontsize=9, ha="center")
+
+    handles = [
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            linestyle="",
+            markersize=9,
+            color=kind_color["model"],
+            label="Tuned model",
+        ),
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            linestyle="",
+            markersize=9,
+            color=kind_color["baseline"],
+            label="Baseline",
+        ),
+    ]
+    ax.legend(handles=handles, loc="lower right")
+
     ax.set_yticks(positions, labels=ordered["model"])
+    ax.set_ylim(-1.3, len(ordered) - 0.4)
     ax.set_xlabel("Cross-validated ROC-AUC (5-fold x 3 repeats, training set)")
-    ax.set_xlim(0.4, max(0.78, float(ordered["cv_roc_auc_mean"].max()) + 0.12))
+    ax.set_xlim(0.47, max(0.76, float(ordered["cv_roc_auc_mean"].max()) + 0.09))
     ax.set_title("AquaSentinel - Model comparison")
     ax.grid(axis="y", visible=False)
     return save_figure(fig, name)
@@ -526,7 +597,7 @@ def plot_target_balance(y: pd.Series, name: str) -> Path:
     fig, ax = plt.subplots(figsize=(5.5, 4.2))
     bars = ax.bar(labels, counts.to_numpy(), color=[SERIES_COLORS[0], SERIES_COLORS[1]], width=0.55)
     total = int(counts.sum())
-    for bar, count in zip(bars, counts.to_numpy()):
+    for bar, count in zip(bars, counts.to_numpy(), strict=True):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + total * 0.012,
@@ -557,7 +628,8 @@ def plot_missingness(report: pd.DataFrame, name: str) -> Path:
     fig, ax = plt.subplots(figsize=(7, 0.55 * max(len(present), 3) + 2))
     positions = np.arange(len(present))
     ax.barh(positions, present["pct_missing"], color=SERIES_COLORS[0], height=0.55)
-    for pos, (count, pct) in enumerate(zip(present["n_missing"], present["pct_missing"])):
+    pairs = zip(present["n_missing"], present["pct_missing"], strict=True)
+    for pos, (count, pct) in enumerate(pairs):
         ax.text(pct + 0.4, pos, f"{pct:.1f}%  ({count:,} rows)", va="center", fontsize=9)
     ax.set_yticks(positions, labels=present.index)
     ax.set_xlabel("Missing values (% of rows)")
@@ -587,7 +659,7 @@ def plot_feature_distributions(
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.4 * n_cols, 3.1 * n_rows))
     axes = np.atleast_1d(axes).ravel()
 
-    for ax, column in zip(axes, columns):
+    for ax, column in zip(axes, columns, strict=False):
         for cls, color, label in (
             (0, SERIES_COLORS[0], config.NEGATIVE_CLASS_NAME),
             (1, SERIES_COLORS[1], config.POSITIVE_CLASS_NAME),
@@ -603,7 +675,9 @@ def plot_feature_distributions(
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 1.0))
     fig.suptitle(
-        "AquaSentinel - Feature distributions by class (density)", y=1.045, fontsize=12,
+        "AquaSentinel - Feature distributions by class (density)",
+        y=1.045,
+        fontsize=12,
         fontweight="bold",
     )
     fig.tight_layout()
@@ -631,7 +705,12 @@ def plot_correlation_heatmap(frame: pd.DataFrame, name: str) -> Path:
         for j in range(len(corr)):
             value = corr.iloc[i, j]
             ax.text(
-                j, i, f"{value:.2f}", ha="center", va="center", fontsize=8,
+                j,
+                i,
+                f"{value:.2f}",
+                ha="center",
+                va="center",
+                fontsize=8,
                 color=SURFACE if abs(value) > 0.55 else INK_PRIMARY,
             )
     fig.colorbar(image, ax=ax, shrink=0.8, label="Pearson correlation")

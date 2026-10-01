@@ -93,9 +93,7 @@ def shap_summary(
         return None
 
     model = pipeline.named_steps["model"]
-    sample = x.sample(
-        n=min(max_samples, len(x)), random_state=config.RANDOM_SEED
-    ).sort_index()
+    sample = x.sample(n=min(max_samples, len(x)), random_state=config.RANDOM_SEED).sort_index()
     transformed = _transformed_frame(pipeline, sample)
 
     try:
@@ -107,10 +105,7 @@ def shap_summary(
     values = np.asarray(values)
     if values.ndim == 3:
         # (n_samples, n_features, n_classes) or (n_classes, n_samples, n_features)
-        if values.shape[-1] == 2:
-            values = values[:, :, 1]
-        else:
-            values = values[1]
+        values = values[:, :, 1] if values.shape[-1] == 2 else values[1]
     return values, transformed
 
 
@@ -130,8 +125,11 @@ def plot_shap_summary(values: np.ndarray, transformed: pd.DataFrame, name: str) 
     evaluate.apply_style()
     fig = plt.figure(figsize=(8, 6))
     shap.summary_plot(values, transformed, show=False, plot_size=None)
-    plt.title("AquaSentinel - SHAP summary (impact on predicted P(UNSAFE))", fontsize=12,
-              fontweight="bold")
+    plt.title(
+        "AquaSentinel - SHAP summary (impact on predicted P(UNSAFE))",
+        fontsize=12,
+        fontweight="bold",
+    )
     plt.tight_layout()
     return evaluate.save_figure(fig, name)
 
@@ -153,7 +151,7 @@ def plot_shap_dependence(
     evaluate.apply_style()
     fig, axes = plt.subplots(1, len(features), figsize=(5.2 * len(features), 4.2))
     axes = np.atleast_1d(axes)
-    for ax, feature in zip(axes, features):
+    for ax, feature in zip(axes, features, strict=True):
         position = list(transformed.columns).index(feature)
         ax.scatter(
             transformed[feature],

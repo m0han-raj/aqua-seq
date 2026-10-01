@@ -62,7 +62,9 @@ def _wrap(estimator: object, scale: bool) -> Pipeline:
 
 # Imputation strategies are tuned as a hyperparameter, so the median-vs-KNN comparison
 # happens inside cross-validation on the training set only.
-_IMPUTER_SPACE = {"preprocess__numeric__impute": [features.build_imputer(n) for n in features.IMPUTER_CHOICES]}
+_IMPUTER_SPACE = {
+    "preprocess__numeric__impute": [features.build_imputer(n) for n in features.IMPUTER_CHOICES]
+}
 
 
 def build_model_specs() -> list[ModelSpec]:
@@ -94,9 +96,7 @@ def build_model_specs() -> list[ModelSpec]:
     specs.append(
         ModelSpec(
             name="Random Forest",
-            pipeline=_wrap(
-                RandomForestClassifier(random_state=seed, n_jobs=-1), scale=False
-            ),
+            pipeline=_wrap(RandomForestClassifier(random_state=seed, n_jobs=-1), scale=False),
             param_distributions={
                 **_IMPUTER_SPACE,
                 "model__n_estimators": [300, 500, 800],
