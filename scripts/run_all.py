@@ -106,9 +106,7 @@ def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
     for column in config.FEATURES:
         unsafe_values = feature_frame.loc[target == 1, column].dropna()
         safe_values = feature_frame.loc[target == 0, column].dropna()
-        statistic, p_value = mannwhitneyu(
-            unsafe_values, safe_values, alternative="two-sided"
-        )
+        statistic, p_value = mannwhitneyu(unsafe_values, safe_values, alternative="two-sided")
         # Rank-biserial correlation: 2*AUC - 1, bounded [-1, 1]; 0 means no separation.
         auc = statistic / (len(unsafe_values) * len(safe_values))
         tests.append(
@@ -154,9 +152,7 @@ def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
         "missingness": missing.to_dict(orient="index"),
         "missingness_vs_target": missing_vs_target,
         "impossible_values": {
-            "ph_outside_0_14": int(
-                ((raw["ph"] < 0) | (raw["ph"] > 14)).sum()
-            ),
+            "ph_outside_0_14": int(((raw["ph"] < 0) | (raw["ph"] > 14)).sum()),
             "negative_values_any_feature": int((feature_frame < 0).sum().sum()),
         },
         "strongest_univariate_effects": tests_frame.head(3)[
@@ -360,16 +356,12 @@ def run_final_evaluation(
 ) -> dict[str, Any]:
     """Select the threshold on CV predictions, then evaluate ONCE on the test set."""
     log("Step 7: threshold selection and final test evaluation")
-    best_name = str(
-        leaderboard[leaderboard["kind"] == "model"].iloc[0]["model"]
-    )
+    best_name = str(leaderboard[leaderboard["kind"] == "model"].iloc[0]["model"])
     best_pipeline = fitted[best_name]
     log(f"  best model by CV ROC-AUC: {best_name}")
 
     # --- Threshold chosen on cross-validated TRAINING predictions only ---------------
-    cv = StratifiedKFold(
-        n_splits=config.CV_FOLDS, shuffle=True, random_state=config.RANDOM_SEED
-    )
+    cv = StratifiedKFold(n_splits=config.CV_FOLDS, shuffle=True, random_state=config.RANDOM_SEED)
     oof_scores = cross_val_predict(
         clone(best_pipeline),
         split.x_train,
@@ -423,6 +415,20 @@ def run_final_evaluation(
     )
     evaluate.plot_calibration(split.y_test, test_scores, best_name, "10_calibration")
 
+    # Persist the exact test-set predictions so notebooks and any downstream analysis
+    # read the real numbers instead of refitting the model and risking silent drift.
+    write_csv(
+        pd.DataFrame(
+            {
+                "row_index": split.x_test.index,
+                "y_true_unsafe": split.y_test.to_numpy(),
+                "score_unsafe": test_scores,
+                "y_pred_at_chosen_threshold": (test_scores >= choice.threshold).astype(int),
+            }
+        ),
+        "test_predictions",
+    )
+
     payload = {
         "best_model": best_name,
         "label_mapping": {
@@ -440,8 +446,13 @@ def run_final_evaluation(
         "dummy_baseline_test": dummy_metrics,
     }
     write_json(payload, "final_evaluation")
-    return {"payload": payload, "model": final_model, "test_scores": test_scores,
-            "best_name": best_name, "choice": choice}
+    return {
+        "payload": payload,
+        "model": final_model,
+        "test_scores": test_scores,
+        "best_name": best_name,
+        "choice": choice,
+    }
 
 
 # --------------------------------------------------------------------------------------
@@ -450,9 +461,7 @@ def run_final_evaluation(
 def run_explainability(final: dict[str, Any], split: data.SplitData) -> dict[str, Any]:
     """Permutation importance and SHAP for the final model."""
     log("Step 8: explainability")
-    importance = explain.permutation_importance_frame(
-        final["model"], split.x_test, split.y_test
-    )
+    importance = explain.permutation_importance_frame(final["model"], split.x_test, split.y_test)
     write_csv(importance, "permutation_importance")
     evaluate.plot_permutation_importance(importance, "11_permutation_importance")
 
@@ -466,9 +475,9 @@ def run_explainability(final: dict[str, Any], split: data.SplitData) -> dict[str
         explain.plot_shap_dependence(values, transformed, top_two, "13_shap_dependence")
         shap_status = "computed"
         write_csv(
-            pd.DataFrame(
-                {"feature": transformed.columns, "mean_abs_shap": mean_abs}
-            ).sort_values("mean_abs_shap", ascending=False),
+            pd.DataFrame({"feature": transformed.columns, "mean_abs_shap": mean_abs}).sort_values(
+                "mean_abs_shap", ascending=False
+            ),
             "shap_importance",
         )
 
@@ -548,7 +557,10 @@ def main() -> int:
     run_rule_baseline(raw)
 
     split = data.make_split(raw)
-    log(f"Split: {split.n_train:,} train / {split.n_test:,} test (stratified, seed {config.RANDOM_SEED})")
+    log(
+        f"Split: {split.n_train:,} train / {split.n_test:,} test "
+        f"(stratified, seed {config.RANDOM_SEED})"
+    )
     split.x_train.assign(**{config.TARGET: split.y_train}).to_csv(
         config.PROCESSED_DATA_DIR / "train.csv", index=False
     )
