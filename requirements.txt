@@ -1,0 +1,33 @@
+# AquaSentinel pinned dependencies.
+# Versions confirmed working by a full `python scripts/run_all.py` + `pytest` run
+# on Python 3.12.10 (Windows 11), 2026-10-01.
+
+# --- core numerics / data ---
+numpy==2.5.3
+pandas==3.0.6
+scipy==1.18.1
+
+# --- modelling ---
+scikit-learn==1.9.1
+xgboost==3.4.1
+lightgbm==4.7.0
+
+# --- explainability ---
+shap==0.52.0
+
+# --- plotting ---
+matplotlib==3.11.2
+
+# --- data acquisition ---
+kagglehub==1.0.2
+
+# --- notebooks ---
+jupyter==1.1.1
+ipykernel==7.4.0
+nbformat==5.11.1
+nbconvert==7.17.1
+
+# --- quality gate ---
+black==26.5.1
+ruff==0.16.9
+pytest==9.1.1
