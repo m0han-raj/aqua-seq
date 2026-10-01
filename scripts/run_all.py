@@ -1,4 +1,4 @@
-"""Run the entire AquaSentinel pipeline end to end, deterministically.
+"""Run the entire Aqua-Seq pipeline end to end, deterministically.
 
 Regenerates every file in ``results/metrics`` and ``results/figures`` from the raw
 CSV with no manual steps:
@@ -37,7 +37,7 @@ from sklearn.model_selection import (
     cross_val_score,
 )
 
-from aquasentinel import config, data, evaluate, explain, features, models, report
+from aqua_seq import config, data, evaluate, explain, features, models, report
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -67,7 +67,7 @@ def write_csv(frame: pd.DataFrame, name: str, index: bool = False) -> Path:
 
 def log(message: str) -> None:
     """Print a progress line with a stage marker."""
-    print(f"[aquasentinel] {message}", flush=True)
+    print(f"[Aqua-Seq] {message}", flush=True)
 
 
 def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
@@ -386,7 +386,7 @@ def run_final_evaluation(
     evaluate.plot_confusion_matrix(
         split.y_test,
         (test_scores >= choice.threshold).astype(int),
-        f"AquaSentinel - {best_name} on the test set at threshold {choice.threshold:.3f}",
+        f"Aqua-Seq - {best_name} on the test set at threshold {choice.threshold:.3f}",
         "09_confusion_matrix",
     )
     evaluate.plot_calibration(split.y_test, test_scores, best_name, "10_calibration")
@@ -520,7 +520,7 @@ def main() -> int:
     set_global_seeds()
     config.ensure_output_dirs()
 
-    log(f"AquaSentinel pipeline, seed={config.RANDOM_SEED}")
+    log(f"Aqua-Seq pipeline, seed={config.RANDOM_SEED}")
     raw = data.load_raw()
     log(f"Loaded {len(raw):,} rows x {raw.shape[1]} columns from {config.RAW_CSV}")
 

@@ -317,7 +317,7 @@ def plot_roc_curves(curves: dict[str, tuple[np.ndarray, np.ndarray]], name: str)
     )
     ax.set_xlabel("False positive rate (safe samples flagged unsafe)")
     ax.set_ylabel("True positive rate (unsafe samples caught)")
-    ax.set_title("AquaSentinel - ROC curves, UNSAFE as positive class")
+    ax.set_title("Aqua-Seq - ROC curves, UNSAFE as positive class")
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1.02)
     ax.legend(loc="lower right")
@@ -358,7 +358,7 @@ def plot_pr_curves(
     )
     ax.set_xlabel("Recall on UNSAFE")
     ax.set_ylabel("Precision on UNSAFE")
-    ax.set_title("AquaSentinel - Precision-recall curves, UNSAFE as positive class")
+    ax.set_title("Aqua-Seq - Precision-recall curves, UNSAFE as positive class")
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1.02)
     ax.legend(loc="lower left")
@@ -452,7 +452,7 @@ def plot_threshold_tradeoff(sweep: pd.DataFrame, chosen: ThresholdChoice, name: 
     ax.set_xlabel("Decision threshold on predicted P(UNSAFE)")
     ax.set_ylabel("Rate")
     ax.set_ylim(0, 1.02)
-    ax.set_title("AquaSentinel - Risk-aware threshold trade-off (cross-validated, training set)")
+    ax.set_title("Aqua-Seq - Risk-aware threshold trade-off (cross-validated, training set)")
     ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5))
     return save_figure(fig, name)
 
@@ -482,7 +482,7 @@ def plot_calibration(
     ax.plot(prob_pred, prob_true, color=SERIES_COLORS[0], marker="o", markersize=8, label=label)
     ax.set_xlabel("Mean predicted P(UNSAFE)")
     ax.set_ylabel("Observed fraction UNSAFE")
-    ax.set_title("AquaSentinel - Calibration of predicted unsafe probability")
+    ax.set_title("Aqua-Seq - Calibration of predicted unsafe probability")
     ax.legend(loc="upper left")
     return save_figure(fig, name)
 
@@ -566,7 +566,7 @@ def plot_model_comparison(frame: pd.DataFrame, name: str) -> Path:
     ax.set_ylim(-1.3, len(ordered) - 0.4)
     ax.set_xlabel("Cross-validated ROC-AUC (5-fold x 3 repeats, training set)")
     ax.set_xlim(0.47, max(0.76, float(ordered["cv_roc_auc_mean"].max()) + 0.09))
-    ax.set_title("AquaSentinel - Model comparison")
+    ax.set_title("Aqua-Seq - Model comparison")
     ax.grid(axis="y", visible=False)
     return save_figure(fig, name)
 
@@ -598,7 +598,7 @@ def plot_target_balance(y: pd.Series, name: str) -> Path:
         )
     ax.set_ylabel("Number of samples")
     ax.set_ylim(0, counts.max() * 1.22)
-    ax.set_title("AquaSentinel - Class balance (UNSAFE = Potability 0)")
+    ax.set_title("Aqua-Seq - Class balance (UNSAFE = Potability 0)")
     ax.grid(axis="x", visible=False)
     return save_figure(fig, name)
 
@@ -607,7 +607,7 @@ def plot_missingness(report: pd.DataFrame, name: str) -> Path:
     """Plot percentage of missing values per column.
 
     Args:
-        report: Output of :func:`aquasentinel.data.missingness_report`.
+        report: Output of :func:`aqua_seq.data.missingness_report`.
         name: Figure file stem.
 
     Returns:
@@ -624,7 +624,7 @@ def plot_missingness(report: pd.DataFrame, name: str) -> Path:
     ax.set_yticks(positions, labels=present.index)
     ax.set_xlabel("Missing values (% of rows)")
     ax.set_xlim(0, float(present["pct_missing"].max()) * 1.45)
-    ax.set_title("AquaSentinel - Missing values by column")
+    ax.set_title("Aqua-Seq - Missing values by column")
     ax.grid(axis="y", visible=False)
     return save_figure(fig, name)
 
@@ -665,7 +665,7 @@ def plot_feature_distributions(
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 1.0))
     fig.suptitle(
-        "AquaSentinel - Feature distributions by class (density)",
+        "Aqua-Seq - Feature distributions by class (density)",
         y=1.045,
         fontsize=12,
         fontweight="bold",
@@ -704,7 +704,7 @@ def plot_correlation_heatmap(frame: pd.DataFrame, name: str) -> Path:
                 color=SURFACE if abs(value) > 0.55 else INK_PRIMARY,
             )
     fig.colorbar(image, ax=ax, shrink=0.8, label="Pearson correlation")
-    ax.set_title("AquaSentinel - Feature correlation matrix")
+    ax.set_title("Aqua-Seq - Feature correlation matrix")
     return save_figure(fig, name)
 
 
@@ -733,7 +733,7 @@ def plot_permutation_importance(frame: pd.DataFrame, name: str) -> Path:
     ax.axvline(0, color=INK_MUTED, linewidth=1.2)
     ax.set_yticks(positions, labels=ordered["feature"])
     ax.set_xlabel("Drop in ROC-AUC when the feature is shuffled (test set)")
-    ax.set_title("AquaSentinel - Permutation importance of the final model")
+    ax.set_title("Aqua-Seq - Permutation importance of the final model")
     ax.grid(axis="y", visible=False)
     return save_figure(fig, name)
 

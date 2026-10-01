@@ -21,7 +21,7 @@
     "search_best_roc_auc": 0.514112548189434,
     "chosen_imputer": "SimpleImputer",
     "chosen_imputer_add_indicator": false,
-    "fit_seconds": 7.8,
+    "fit_seconds": 7.2,
     "best_params": {
       "preprocess__numeric__impute": "SimpleImputer",
       "model__penalty": "l1",
@@ -37,7 +37,7 @@
     "search_best_roc_auc": 0.6933880908382545,
     "chosen_imputer": "SimpleImputer",
     "chosen_imputer_add_indicator": true,
-    "fit_seconds": 268.2,
+    "fit_seconds": 251.7,
     "best_params": {
       "preprocess__numeric__impute": "SimpleImputer",
       "model__n_estimators": 800,
@@ -55,7 +55,7 @@
     "search_best_roc_auc": 0.677426221348697,
     "chosen_imputer": "KNNImputer",
     "chosen_imputer_add_indicator": true,
-    "fit_seconds": 180.5,
+    "fit_seconds": 149.1,
     "best_params": {
       "preprocess__numeric__impute": "KNNImputer",
       "model__subsample": 0.7,
@@ -73,7 +73,7 @@
     "search_best_roc_auc": 0.6716120876584826,
     "chosen_imputer": "SimpleImputer",
     "chosen_imputer_add_indicator": true,
-    "fit_seconds": 117.4,
+    "fit_seconds": 101.4,
     "best_params": {
       "preprocess__numeric__impute": "SimpleImputer",
       "model__subsample": 0.7,
@@ -93,7 +93,7 @@
     "search_best_roc_auc": 0.6729567274717441,
     "chosen_imputer": "SimpleImputer",
     "chosen_imputer_add_indicator": true,
-    "fit_seconds": 114.6,
+    "fit_seconds": 158.5,
     "best_params": {
       "preprocess__numeric__impute": "SimpleImputer",
       "model__subsample": 0.85,

@@ -1,4 +1,4 @@
-"""AquaSentinel: Risk-Aware Water Safety Screening from Physicochemical Parameters.
+"""Aqua-Seq: Risk-Aware Water Safety Screening from Physicochemical Parameters.
 
 An analysis of the public Kaggle "Water Potability" dataset. The package provides a
 leakage-safe modelling pipeline, a guideline-based rule baseline and a risk-aware

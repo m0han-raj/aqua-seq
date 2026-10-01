@@ -125,7 +125,7 @@ def plot_shap_summary(values: np.ndarray, transformed: pd.DataFrame, name: str) 
     fig = plt.figure(figsize=(8, 6))
     shap.summary_plot(values, transformed, show=False, plot_size=None)
     plt.title(
-        "AquaSentinel - SHAP summary (impact on predicted P(UNSAFE))",
+        "Aqua-Seq - SHAP summary (impact on predicted P(UNSAFE))",
         fontsize=12,
         fontweight="bold",
     )
@@ -165,7 +165,7 @@ def plot_shap_dependence(
         ax.set_ylabel("SHAP value -> P(UNSAFE)")
         ax.set_title(feature, fontsize=11)
     fig.suptitle(
-        "AquaSentinel - SHAP dependence for the two most important features",
+        "Aqua-Seq - SHAP dependence for the two most important features",
         fontsize=12,
         fontweight="bold",
     )

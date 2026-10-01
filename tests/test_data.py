@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from aquasentinel import config, data
+from aqua_seq import config, data
 
 
 @pytest.fixture(scope="module")

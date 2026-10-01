@@ -13,7 +13,7 @@ import pytest
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 
-from aquasentinel import config, data, features
+from aqua_seq import config, data, features
 
 
 @pytest.fixture(scope="module")
@@ -84,7 +84,7 @@ def test_extreme_test_values_cannot_influence_the_fitted_pipeline(
 
 def test_preprocessing_is_inside_the_estimator_pipeline() -> None:
     """Every candidate model must carry its preprocessing, so CV refits it per fold."""
-    from aquasentinel import models
+    from aqua_seq import models
 
     for spec in models.build_model_specs():
         assert isinstance(spec.pipeline, Pipeline)
@@ -96,7 +96,7 @@ def test_preprocessing_is_inside_the_estimator_pipeline() -> None:
 
 def test_imputation_strategy_is_tuned_inside_cross_validation() -> None:
     """The median-vs-KNN comparison must be a pipeline parameter, not a pre-step."""
-    from aquasentinel import models
+    from aqua_seq import models
 
     for spec in models.build_model_specs():
         assert (

@@ -1,4 +1,4 @@
-# AquaSentinel pinned dependencies.
+# Aqua-Seq pinned dependencies.
 # Versions confirmed working by a full `python scripts/run_all.py` + `pytest` run
 # on Python 3.12.10 (Windows 11), 2026-10-01.
 

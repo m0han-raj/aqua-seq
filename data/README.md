@@ -44,14 +44,14 @@ limitations section of the top-level README.
 
 ### Target encoding used in this project
 
-AquaSentinel models the **unsafe** class as the positive class, because a missed unsafe
+Aqua-Seq models the **unsafe** class as the positive class, because a missed unsafe
 sample is the costly error:
 
 ```
 unsafe = 1 - Potability      # 1 == UNSAFE == (Potability == 0)
 ```
 
-This mapping is defined once in `src/aquasentinel/config.py` and is covered by a test
+This mapping is defined once in `src/aqua_seq/config.py` and is covered by a test
 (`tests/test_data.py::test_unsafe_label_is_the_complement_of_potability`).
 
 ### Missing values
@@ -101,4 +101,4 @@ kaggle datasets download -d adityakadiwal/water-potability -p data/raw --unzip
 `data/raw/water_potability.csv`.
 
 The pipeline validates the schema on load and raises a clear error if the file is
-missing or its columns do not match (`src/aquasentinel/data.py`).
+missing or its columns do not match (`src/aqua_seq/data.py`).

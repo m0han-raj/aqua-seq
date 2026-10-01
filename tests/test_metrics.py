@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from aquasentinel import config, evaluate, features
+from aqua_seq import config, evaluate, features
 
 
 def test_metrics_on_a_perfect_classifier() -> None:
