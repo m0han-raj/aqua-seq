@@ -1,0 +1,63 @@
+{
+  "permutation_importance": [
+    {
+      "feature": "ph",
+      "importance_mean": 0.11386962890625,
+      "importance_std": 0.014519652589091355
+    },
+    {
+      "feature": "Sulfate",
+      "importance_mean": 0.10189648437500005,
+      "importance_std": 0.018211563341800643
+    },
+    {
+      "feature": "Hardness",
+      "importance_mean": 0.06325146484375001,
+      "importance_std": 0.006718201708045638
+    },
+    {
+      "feature": "Solids",
+      "importance_mean": 0.04044433593750002,
+      "importance_std": 0.009751896844873756
+    },
+    {
+      "feature": "Chloramines",
+      "importance_mean": 0.03816943359375001,
+      "importance_std": 0.010002315002938822
+    },
+    {
+      "feature": "Trihalomethanes",
+      "importance_mean": 0.004431640624999999,
+      "importance_std": 0.003961534564220748
+    },
+    {
+      "feature": "Turbidity",
+      "importance_mean": 0.0025844726562500196,
+      "importance_std": 0.0036060359091322227
+    },
+    {
+      "feature": "Organic_carbon",
+      "importance_mean": 0.002257324218750012,
+      "importance_std": 0.004015922891573771
+    },
+    {
+      "feature": "Conductivity",
+      "importance_mean": -0.001582519531249993,
+      "importance_std": 0.005832355078913289
+    }
+  ],
+  "shap_status": "computed",
+  "parameters_in_rule": [
+    "Chloramines",
+    "Hardness",
+    "Solids",
+    "Sulfate",
+    "Trihalomethanes",
+    "Turbidity",
+    "ph"
+  ],
+  "parameters_excluded_from_rule": [
+    "Conductivity",
+    "Organic_carbon"
+  ]
+}

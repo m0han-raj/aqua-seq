@@ -1,0 +1,102 @@
+{
+  "parameters_used": {
+    "ph": {
+      "lower": 6.5,
+      "upper": 8.5,
+      "unit": "pH units",
+      "source": "BIS IS 10500:2012 (acceptable limit; no relaxation permitted)",
+      "url": "https://infralens.in/code/IS-10500-2012",
+      "note": "WHO GDWQ 4th ed. Annex 3 lists pH as 'Not of health concern at levels found in drinking-water' and sets no health-based guideline value, but 6.5-8.5 is recommended for operational/disinfection reasons.",
+      "n_violations": 1457,
+      "pct_violations": 44.47496947496947,
+      "n_measured": 2785
+    },
+    "Hardness": {
+      "lower": null,
+      "upper": 600.0,
+      "unit": "mg/L (as CaCO3)",
+      "source": "BIS IS 10500:2012 (permissible limit in absence of alternate source)",
+      "url": "https://infralens.in/code/IS-10500-2012",
+      "note": "WHO GDWQ 4th ed. Annex 3: 'Hardness - Not of health concern at levels found in drinking-water'; no WHO guideline value exists.",
+      "n_violations": 0,
+      "pct_violations": 0.0,
+      "n_measured": 3276
+    },
+    "Solids": {
+      "lower": null,
+      "upper": 2000.0,
+      "unit": "mg/L (total dissolved solids)",
+      "source": "BIS IS 10500:2012 (permissible limit in absence of alternate source)",
+      "url": "https://infralens.in/code/IS-10500-2012",
+      "note": "WHO GDWQ 4th ed. Annex 3: 'Total dissolved solids - Not of health concern at levels found in drinking-water'. NOTE: the Kaggle column is labelled ppm but has a median near 21,000, i.e. roughly 10x the BIS permissible limit for essentially every row, so this rule term fires almost always. See the README limitations section.",
+      "n_violations": 3271,
+      "pct_violations": 99.84737484737485,
+      "n_measured": 3276
+    },
+    "Chloramines": {
+      "lower": null,
+      "upper": 4.0,
+      "unit": "mg/L (as Cl2)",
+      "source": "US EPA National Primary Drinking Water Regulations (MRDL)",
+      "url": "https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations",
+      "note": "US EPA maximum residual disinfectant level for chloramines (as Cl2) is 4.0 mg/L. WHO GDWQ Annex 3 gives 3 mg/L for MONOchloramine specifically; the dataset column is the aggregate, so the EPA aggregate MRDL is used.",
+      "n_violations": 3187,
+      "pct_violations": 97.28327228327228,
+      "n_measured": 3276
+    },
+    "Sulfate": {
+      "lower": null,
+      "upper": 400.0,
+      "unit": "mg/L (as SO4)",
+      "source": "BIS IS 10500:2012 (permissible limit in absence of alternate source)",
+      "url": "https://infralens.in/code/IS-10500-2012",
+      "note": "WHO GDWQ 4th ed. Annex 3: 'Sulfate - Not of health concern at levels found in drinking-water'; no WHO guideline value exists.",
+      "n_violations": 138,
+      "pct_violations": 4.212454212454213,
+      "n_measured": 2495
+    },
+    "Trihalomethanes": {
+      "lower": null,
+      "upper": 80.0,
+      "unit": "ug/L (total THMs)",
+      "source": "US EPA National Primary Drinking Water Regulations (MCL for TTHMs)",
+      "url": "https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations",
+      "note": "US EPA MCL for total trihalomethanes is 0.080 mg/L = 80 ug/L. WHO does NOT publish a single total-THM value: Annex 3 states 'Trihalomethanes - The sum of the ratio of the concentration of each to its respective guideline value should not exceed 1', which cannot be applied here because the dataset reports only the aggregate.",
+      "n_violations": 602,
+      "pct_violations": 18.37606837606838,
+      "n_measured": 3114
+    },
+    "Turbidity": {
+      "lower": null,
+      "upper": 5.0,
+      "unit": "NTU",
+      "source": "BIS IS 10500:2012 (permissible limit in absence of alternate source)",
+      "url": "https://infralens.in/code/IS-10500-2012",
+      "note": "BIS acceptable limit is 1 NTU, permissible 5 NTU. WHO GDWQ sets no health-based guideline value for turbidity.",
+      "n_violations": 314,
+      "pct_violations": 9.584859584859586,
+      "n_measured": 3276
+    }
+  },
+  "parameters_excluded": {
+    "Conductivity": "Neither WHO GDWQ 4th ed. Annex 3 nor BIS IS 10500:2012 publishes a numeric drinking-water limit for electrical conductivity; conductivity is normally regulated indirectly via total dissolved solids. Excluded from the rule.",
+    "Organic_carbon": "WHO GDWQ 4th ed. Annex 3 lists no guideline value for total organic carbon, and the US EPA regulates TOC through required percentage removal under the Disinfectants/Disinfection By-products Rule rather than a concentration MCL. No single threshold could be verified, so it is excluded from the rule."
+  },
+  "metrics_full_dataset": {
+    "roc_auc": 0.5,
+    "pr_auc": 0.6098901098901099,
+    "brier": 0.3901098901098901,
+    "threshold": 0.5,
+    "precision_unsafe": 0.6098901098901099,
+    "recall_unsafe": 1.0,
+    "f1_unsafe": 0.757679180887372,
+    "balanced_accuracy": 0.5,
+    "accuracy": 0.6098901098901099,
+    "flag_rate": 1.0,
+    "true_positives": 1998,
+    "false_positives": 1278,
+    "true_negatives": 0,
+    "false_negatives": 0,
+    "n_samples": 3276
+  }
+}

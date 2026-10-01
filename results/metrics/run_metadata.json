@@ -1,0 +1,7 @@
+{
+  "runtime_seconds": 844.4,
+  "python_version": "3.12.10",
+  "random_seed": 42,
+  "numpy_version": "2.5.3",
+  "pandas_version": "3.0.6"
+}

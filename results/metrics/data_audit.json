@@ -1,0 +1,105 @@
+{
+  "n_rows": 3276,
+  "n_features": 9,
+  "n_duplicate_rows": 0,
+  "dtypes": {
+    "ph": "float64",
+    "Hardness": "float64",
+    "Solids": "float64",
+    "Chloramines": "float64",
+    "Sulfate": "float64",
+    "Conductivity": "float64",
+    "Organic_carbon": "float64",
+    "Trihalomethanes": "float64",
+    "Turbidity": "float64",
+    "Potability": "int64"
+  },
+  "class_counts": {
+    "SAFE": 1278,
+    "UNSAFE": 1998
+  },
+  "unsafe_prevalence": 0.6098901098901099,
+  "missingness": {
+    "Sulfate": {
+      "n_missing": 781,
+      "pct_missing": 23.84
+    },
+    "ph": {
+      "n_missing": 491,
+      "pct_missing": 14.99
+    },
+    "Trihalomethanes": {
+      "n_missing": 162,
+      "pct_missing": 4.95
+    },
+    "Hardness": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    },
+    "Chloramines": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    },
+    "Solids": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    },
+    "Conductivity": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    },
+    "Organic_carbon": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    },
+    "Turbidity": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    },
+    "Potability": {
+      "n_missing": 0,
+      "pct_missing": 0.0
+    }
+  },
+  "missingness_vs_target": {
+    "Sulfate": {
+      "unsafe_rate_when_missing": 0.6248399487836107,
+      "unsafe_rate_when_present": 0.6052104208416834,
+      "difference": 0.019629527941927294,
+      "mannwhitney_p": 0.32644484750217506
+    },
+    "ph": {
+      "unsafe_rate_when_missing": 0.639511201629328,
+      "unsafe_rate_when_present": 0.6046678635547577,
+      "difference": 0.034843338074570296,
+      "mannwhitney_p": 0.14451779051915323
+    },
+    "Trihalomethanes": {
+      "unsafe_rate_when_missing": 0.6604938271604939,
+      "unsafe_rate_when_present": 0.607257546563905,
+      "difference": 0.053236280596588914,
+      "mannwhitney_p": 0.17570438615972817
+    }
+  },
+  "impossible_values": {
+    "ph_outside_0_14": 0,
+    "negative_values_any_feature": 0
+  },
+  "strongest_univariate_effects": [
+    {
+      "feature": "Organic_carbon",
+      "rank_biserial_effect_size": 0.03169053247300502,
+      "p_value": 0.1254780609179809
+    },
+    {
+      "feature": "Solids",
+      "rank_biserial_effect_size": -0.031051395683633576,
+      "p_value": 0.1332835806508367
+    },
+    {
+      "feature": "Chloramines",
+      "rank_biserial_effect_size": -0.02956712581125731,
+      "p_value": 0.15285606297629536
+    }
+  ]
+}

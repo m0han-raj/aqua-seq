@@ -1,0 +1,12 @@
+{
+  "outcome_counts": {
+    "true_positive": 355,
+    "false_positive": 172,
+    "true_negative": 84,
+    "false_negative (MISSED UNSAFE)": 45
+  },
+  "n_missed_unsafe": 45,
+  "missed_unsafe_score_median": 0.39549047893004974,
+  "caught_unsafe_score_median": 0.5817473089059572,
+  "score_overlap_note": "Scores for missed and caught unsafe samples overlap heavily, which is the signature of a weak feature-label relationship rather than a tuning problem."
+}

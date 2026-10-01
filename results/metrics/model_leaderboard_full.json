@@ -1,0 +1,109 @@
+[
+  {
+    "model": "Dummy (majority class)",
+    "kind": "baseline",
+    "cv_roc_auc_mean": 0.5,
+    "cv_roc_auc_std": 0.0,
+    "best_params": {}
+  },
+  {
+    "model": "Guideline rule baseline",
+    "kind": "baseline",
+    "cv_roc_auc_mean": 0.528281857287127,
+    "cv_roc_auc_std": 0.018467064537275125,
+    "best_params": {}
+  },
+  {
+    "model": "Logistic Regression",
+    "kind": "model",
+    "cv_roc_auc_mean": 0.5095138187707482,
+    "cv_roc_auc_std": 0.022350276361738995,
+    "search_best_roc_auc": 0.514112548189434,
+    "chosen_imputer": "SimpleImputer",
+    "chosen_imputer_add_indicator": false,
+    "fit_seconds": 7.8,
+    "best_params": {
+      "preprocess__numeric__impute": "SimpleImputer",
+      "model__penalty": "l1",
+      "model__class_weight": null,
+      "model__C": 0.1
+    }
+  },
+  {
+    "model": "Random Forest",
+    "kind": "model",
+    "cv_roc_auc_mean": 0.687676470338371,
+    "cv_roc_auc_std": 0.018288716139308627,
+    "search_best_roc_auc": 0.6933880908382545,
+    "chosen_imputer": "SimpleImputer",
+    "chosen_imputer_add_indicator": true,
+    "fit_seconds": 268.2,
+    "best_params": {
+      "preprocess__numeric__impute": "SimpleImputer",
+      "model__n_estimators": 800,
+      "model__min_samples_leaf": 1,
+      "model__max_features": 0.5,
+      "model__max_depth": 12,
+      "model__class_weight": "balanced"
+    }
+  },
+  {
+    "model": "Gradient Boosting",
+    "kind": "model",
+    "cv_roc_auc_mean": 0.6683093317688086,
+    "cv_roc_auc_std": 0.020809714544458936,
+    "search_best_roc_auc": 0.677426221348697,
+    "chosen_imputer": "KNNImputer",
+    "chosen_imputer_add_indicator": true,
+    "fit_seconds": 180.5,
+    "best_params": {
+      "preprocess__numeric__impute": "KNNImputer",
+      "model__subsample": 0.7,
+      "model__n_estimators": 200,
+      "model__min_samples_leaf": 5,
+      "model__max_depth": 5,
+      "model__learning_rate": 0.02
+    }
+  },
+  {
+    "model": "XGBoost",
+    "kind": "model",
+    "cv_roc_auc_mean": 0.665178276231868,
+    "cv_roc_auc_std": 0.0160823907112161,
+    "search_best_roc_auc": 0.6716120876584826,
+    "chosen_imputer": "SimpleImputer",
+    "chosen_imputer_add_indicator": true,
+    "fit_seconds": 117.4,
+    "best_params": {
+      "preprocess__numeric__impute": "SimpleImputer",
+      "model__subsample": 0.7,
+      "model__scale_pos_weight": 1.0,
+      "model__n_estimators": 300,
+      "model__min_child_weight": 1,
+      "model__max_depth": 4,
+      "model__learning_rate": 0.05,
+      "model__colsample_bytree": 1.0
+    }
+  },
+  {
+    "model": "LightGBM",
+    "kind": "model",
+    "cv_roc_auc_mean": 0.659230019265779,
+    "cv_roc_auc_std": 0.019773996068685847,
+    "search_best_roc_auc": 0.6729567274717441,
+    "chosen_imputer": "SimpleImputer",
+    "chosen_imputer_add_indicator": true,
+    "fit_seconds": 114.6,
+    "best_params": {
+      "preprocess__numeric__impute": "SimpleImputer",
+      "model__subsample": 0.85,
+      "model__num_leaves": 31,
+      "model__n_estimators": 800,
+      "model__min_child_samples": 5,
+      "model__max_depth": -1,
+      "model__learning_rate": 0.02,
+      "model__colsample_bytree": 0.85,
+      "model__class_weight": null
+    }
+  }
+]

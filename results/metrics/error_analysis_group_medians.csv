@@ -1,0 +1,5 @@
+outcome,ph,Hardness,Solids,Chloramines,Sulfate,Conductivity,Organic_carbon,Trihalomethanes,Turbidity
+false_negative (MISSED UNSAFE),6.989,197.374,21318.962,7.881,329.404,389.638,13.425,68.976,3.853
+false_positive,6.81,190.423,20432.842,7.24,333.062,416.342,13.994,67.009,3.939
+true_negative,7.276,195.54,21728.534,7.256,312.091,425.223,14.16,67.329,4.114
+true_positive,7.024,196.035,19909.542,7.016,331.215,427.545,14.034,67.106,3.993

@@ -1,0 +1,8 @@
+model,kind,cv_roc_auc_mean,cv_roc_auc_std,search_best_roc_auc,chosen_imputer,chosen_imputer_add_indicator,fit_seconds
+Random Forest,model,0.687676470338371,0.018288716139308627,0.6933880908382545,SimpleImputer,True,268.2
+Gradient Boosting,model,0.6683093317688086,0.020809714544458936,0.677426221348697,KNNImputer,True,180.5
+XGBoost,model,0.665178276231868,0.0160823907112161,0.6716120876584826,SimpleImputer,True,117.4
+LightGBM,model,0.659230019265779,0.019773996068685847,0.6729567274717441,SimpleImputer,True,114.6
+Guideline rule baseline,baseline,0.528281857287127,0.018467064537275125,,,,
+Logistic Regression,model,0.5095138187707482,0.022350276361738995,0.514112548189434,SimpleImputer,False,7.8
+Dummy (majority class),baseline,0.5,0.0,,,,
