@@ -390,7 +390,9 @@ def build_headline_block() -> str:
         [
             HEADLINE_BEGIN,
             "",
-            f"**Yes, but only marginally.** {final['best_model']} reaches "
+            "## Summary",
+            "",
+            f"{final['best_model']} reaches "
             f"**ROC-AUC {model['roc_auc']:.3f}** ({_ci(cis, 'roc_auc')}) on a test set used "
             f"once. At the risk-aware threshold it catches "
             f"**{model['recall_unsafe']:.0%} of unsafe samples** at "
@@ -422,56 +424,57 @@ def build_compact_block() -> str:
     audit = _read_json("data_audit")
     meta = _read_json("run_metadata")
     model = final["final_model_test_at_chosen_threshold"]
-    default = final["final_model_test_at_default_threshold"]
     cis = final["final_model_test_bootstrap_ci_95"]
     choice = final["threshold_choice"]
     leaderboard = _read_csv("model_leaderboard")
 
-    rows = [
-        f"| {row['model']}{' **(final)**' if row['model'] == final['best_model'] else ''} "
-        f"| {_fmt(row['cv_roc_auc_mean'])} ± {_fmt(row['cv_roc_auc_std'])} |"
-        for _, row in leaderboard.iterrows()
-    ]
+    # Test metrics exist only for the final model and the two baselines: every other
+    # candidate was selected on cross-validation alone and never scored on the test set.
+    tested = {
+        final["best_model"]: model,
+        "Guideline rule baseline": final["rule_baseline_test"],
+        "Dummy (majority class)": final["dummy_baseline_test"],
+    }
+
+    rows = []
+    for _, row in leaderboard.iterrows():
+        name = row["model"]
+        label = f"{name}{' **(final)**' if name == final['best_model'] else ''}"
+        test = tested.get(name)
+        if test is None:
+            cells = "— | — | —"
+        else:
+            cells = (
+                f"{_fmt(test['roc_auc'])} | {_fmt(test['recall_unsafe'])} | "
+                f"{_fmt(test['precision_unsafe'])}"
+            )
+        rows.append(
+            f"| {label} | {_fmt(row['cv_roc_auc_mean'])} ± "
+            f"{_fmt(row['cv_roc_auc_std'])} | {cells} |"
+        )
 
     return "\n".join(
         [
             BEGIN_MARKER,
             "",
-            f"Dataset: {audit['n_rows']:,} samples, "
-            f"**{audit['unsafe_prevalence']:.1%} unsafe** — note unsafe is the *majority* "
-            "class, so flagging everything already gives 100% recall. Precision at high "
-            "recall is the scarce quantity.",
+            f"{audit['n_rows']:,} samples, {audit['unsafe_prevalence']:.1%} unsafe. "
+            f"Cross-validated on the training set (5-fold × 3); test set "
+            f"({final['n_test']:,} samples) scored once at threshold "
+            f"{choice['threshold']:.3f}.",
             "",
-            "**Cross-validated ROC-AUC** (5-fold × 3 repeats, training set only):",
-            "",
-            "| Model | CV ROC-AUC |",
-            "|---|---|",
+            "| Model | CV ROC-AUC | Test ROC-AUC | Recall | Precision |",
+            "|---|---|---|---|---|",
             *rows,
             "",
-            f"**Final model on the held-out test set** ({final['n_test']:,} samples, used once; "
-            f"95% CI from {config.N_BOOTSTRAP:,}-resample bootstrap):",
+            f"95% CI ({config.N_BOOTSTRAP:,}-resample bootstrap) for the final model: "
+            f"ROC-AUC {_ci(cis, 'roc_auc')}, PR-AUC {_fmt(model['pr_auc'])} "
+            f"{_ci(cis, 'pr_auc')}, recall {_ci(cis, 'recall_unsafe')}, "
+            f"precision {_ci(cis, 'precision_unsafe')}.",
             "",
-            "| Metric (UNSAFE = positive) | Value | 95% CI |",
-            "|---|---|---|",
-            f"| ROC-AUC | {_fmt(model['roc_auc'])} | {_ci(cis, 'roc_auc')} |",
-            f"| PR-AUC | {_fmt(model['pr_auc'])} | {_ci(cis, 'pr_auc')} |",
-            f"| Recall (UNSAFE) | {_fmt(model['recall_unsafe'])} | {_ci(cis, 'recall_unsafe')} |",
-            f"| Precision (UNSAFE) | {_fmt(model['precision_unsafe'])} | "
-            f"{_ci(cis, 'precision_unsafe')} |",
-            f"| Balanced accuracy | {_fmt(model['balanced_accuracy'])} | "
-            f"{_ci(cis, 'balanced_accuracy')} |",
-            "",
-            f"**Threshold {choice['threshold']:.3f}** was chosen on cross-validated *training* "
-            f"predictions to reach {choice['target_recall']:.0%} recall at the best precision. "
-            f"Against the default 0.5 it catches "
-            f"{model['true_positives'] - default['true_positives']} more unsafe samples for "
-            f"{model['false_positives'] - default['false_positives']} more wasted lab tests "
-            f"(recall {_fmt(default['recall_unsafe'])} → {_fmt(model['recall_unsafe'])}).",
-            "",
-            f"*Full tables — per-model hyperparameters, guideline limits, imputer comparison, "
-            f"feature importance, error profiles — in "
-            f"[`results/metrics/readme_sections.md`](results/metrics/readme_sections.md). "
-            f"Pipeline runtime {meta['runtime_seconds'] / 60:.0f} min, seed "
+            f"*Full tables in "
+            f"[`results/metrics/readme_sections.md`](results/metrics/readme_sections.md) — "
+            f"hyperparameters, guideline limits, imputer comparison, feature importance, "
+            f"error profiles. Runtime {meta['runtime_seconds'] / 60:.0f} min, seed "
             f"`{meta['random_seed']}`.*",
             "",
             END_MARKER,
