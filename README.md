@@ -252,7 +252,21 @@ In plain terms: moving from the default cut-off to the risk-aware one catches **
 | true_negative | 84 |
 | false_negative (MISSED UNSAFE) | 45 |
 
-Median predicted P(UNSAFE) was 0.582 for unsafe samples the model caught and 0.395 for unsafe samples it missed — the two distributions sit close together, which is the signature of a weak feature–label relationship rather than a fixable tuning problem.
+Median predicted P(UNSAFE) was 0.582 for unsafe samples the model caught and 0.395 for unsafe samples it missed. Those scores differ by construction — the threshold is what separates them — so the informative comparison is the underlying measurements:
+
+| Parameter | Median (missed unsafe) | Median (caught unsafe) | Relative difference |
+|---|---|---|---|
+| `Chloramines` | 7.88 | 7.02 | 12.3% |
+| `Conductivity` | 390 | 428 | 8.9% |
+| `Solids` | 2.13e+04 | 1.99e+04 | 7.1% |
+| `Organic_carbon` | 13.4 | 14 | 4.3% |
+| `Turbidity` | 3.85 | 3.99 | 3.5% |
+| `Trihalomethanes` | 69 | 67.1 | 2.8% |
+| `Hardness` | 197 | 196 | 0.7% |
+| `Sulfate` | 329 | 331 | 0.5% |
+| `ph` | 6.99 | 7.02 | 0.5% |
+
+Across all nine parameters the missed and caught unsafe samples look nearly identical; the largest relative difference in medians is `Chloramines` at 12.3%. There is no region of feature space where the missed samples live, which is why this is a weak feature–label relationship rather than a fixable tuning problem.
 
 ### Run metadata
 
@@ -308,11 +322,13 @@ Median predicted P(UNSAFE) was 0.582 for unsafe samples the model caught and 0.3
 
 **2. Published drinking-water standards do not explain these labels — the rule baseline degenerates into "flag everything" and scores no better than chance.** Applying verified WHO / BIS / US EPA limits flags **100% of samples as unsafe**, because two columns sit off the drinking-water scale entirely: `Solids` breaches the BIS permissible TDS limit in 99.9% of rows (median ≈ 21,000 against a 2,000 mg/L limit) and `Chloramines` breaches the US EPA MRDL in 97.3% (median ≈ 7.1 against 4.0 mg/L). The honest conclusion is not that the guidelines are wrong but that **these measurements do not mean what their column names suggest**, which in turn undermines any claim that the labels encode real potability.
 
-**3. Only non-linear models find any signal at all.** Logistic regression sits essentially at chance while tree ensembles clear it by a clear margin. Combined with the near-zero univariate effect sizes from the EDA, this says whatever structure exists is interaction-driven and weak — not something a better linear model or more feature engineering would rescue.
+**3. The model and the guidelines agree on *which* parameters matter — and disagree on *where the lines sit*.** The three parameters the model relies on most (`ph`, `Sulfate`, `Hardness`) are all regulated parameters with verified limits, and the two we had to exclude from the rule for lack of a verifiable limit (`Organic_carbon`, `Conductivity`) are also the two the model finds essentially useless — `Conductivity` scores slightly *negative* permutation importance, i.e. pure noise. Yet the rule built from those same parameters still scores no better than chance. The right variables with the wrong thresholds is exactly the pattern you would expect if the labels were not generated from drinking-water standards.
 
-**4. The errors are not a tuning problem.** Unsafe samples the model misses and unsafe samples it catches have nearly identical predicted-score distributions and nearly identical feature profiles. There is no identifiable sub-population to repair. This is the signature of a weak feature–label relationship, and it is why no amount of additional hyperparameter search would move the headline much.
+**4. Only non-linear models find any signal at all.** Logistic regression sits essentially at chance while tree ensembles clear it by a clear margin. Combined with the near-zero univariate effect sizes from the EDA, this says whatever structure exists is interaction-driven and weak — not something a better linear model or more feature engineering would rescue.
 
-**5. Imputation choice is not the bottleneck.** Median and KNN imputation, with and without missing-indicator features, land within noise of each other under cross-validation — despite `Sulfate` missing 23.8% of its values. Worth knowing, because missingness is the most visible flaw in this dataset and it is *not* what limits performance.
+**5. The errors are not a tuning problem.** Unsafe samples the model misses and unsafe samples it catches have nearly identical measurements: across all nine parameters the median values differ by at most ~12%, and for `ph`, `Sulfate` and `Hardness` — the features the model relies on most — by under 1%. There is no region of feature space where the missed samples live, so there is no identifiable sub-population to repair. This is the signature of a weak feature–label relationship, and it is why more hyperparameter search would not move the headline.
+
+**6. Imputation choice is not the bottleneck.** Median and KNN imputation, with and without missing-indicator features, land within noise of each other under cross-validation — despite `Sulfate` missing 23.8% of its values. Worth knowing, because missingness is the most visible flaw in this dataset and it is *not* what limits performance.
 
 ### What this model can and cannot be trusted for
 

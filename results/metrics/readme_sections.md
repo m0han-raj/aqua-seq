@@ -124,7 +124,21 @@ In plain terms: moving from the default cut-off to the risk-aware one catches **
 | true_negative | 84 |
 | false_negative (MISSED UNSAFE) | 45 |
 
-Median predicted P(UNSAFE) was 0.582 for unsafe samples the model caught and 0.395 for unsafe samples it missed — the two distributions sit close together, which is the signature of a weak feature–label relationship rather than a fixable tuning problem.
+Median predicted P(UNSAFE) was 0.582 for unsafe samples the model caught and 0.395 for unsafe samples it missed. Those scores differ by construction — the threshold is what separates them — so the informative comparison is the underlying measurements:
+
+| Parameter | Median (missed unsafe) | Median (caught unsafe) | Relative difference |
+|---|---|---|---|
+| `Chloramines` | 7.88 | 7.02 | 12.3% |
+| `Conductivity` | 390 | 428 | 8.9% |
+| `Solids` | 2.13e+04 | 1.99e+04 | 7.1% |
+| `Organic_carbon` | 13.4 | 14 | 4.3% |
+| `Turbidity` | 3.85 | 3.99 | 3.5% |
+| `Trihalomethanes` | 69 | 67.1 | 2.8% |
+| `Hardness` | 197 | 196 | 0.7% |
+| `Sulfate` | 329 | 331 | 0.5% |
+| `ph` | 6.99 | 7.02 | 0.5% |
+
+Across all nine parameters the missed and caught unsafe samples look nearly identical; the largest relative difference in medians is `Chloramines` at 12.3%. There is no region of feature space where the missed samples live, which is why this is a weak feature–label relationship rather than a fixable tuning problem.
 
 ### Run metadata
 
