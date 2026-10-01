@@ -20,7 +20,6 @@ def test_raw_file_exists_and_loads(raw: pd.DataFrame) -> None:
 
 
 def test_expected_shape(raw: pd.DataFrame) -> None:
-    # The published Kaggle dataset has 3,276 rows and 9 features plus the target.
     assert raw.shape == (3276, 10)
 
 

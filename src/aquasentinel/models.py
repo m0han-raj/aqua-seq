@@ -18,18 +18,18 @@ from sklearn.pipeline import Pipeline
 
 from . import config, features
 
-try:  # pragma: no cover - exercised implicitly by run_all
+try:
     from lightgbm import LGBMClassifier
 
     HAS_LIGHTGBM = True
-except ImportError:  # pragma: no cover
+except ImportError:
     HAS_LIGHTGBM = False
 
-try:  # pragma: no cover
+try:
     from xgboost import XGBClassifier
 
     HAS_XGBOOST = True
-except ImportError:  # pragma: no cover
+except ImportError:
     HAS_XGBOOST = False
 
 
@@ -60,8 +60,6 @@ def _wrap(estimator: object, scale: bool) -> Pipeline:
     )
 
 
-# Imputation strategies are tuned as a hyperparameter, so the median-vs-KNN comparison
-# happens inside cross-validation on the training set only.
 _IMPUTER_SPACE = {
     "preprocess__numeric__impute": [features.build_imputer(n) for n in features.IMPUTER_CHOICES]
 }
@@ -146,7 +144,6 @@ def build_model_specs() -> list[ModelSpec]:
                     "model__subsample": [0.7, 0.85, 1.0],
                     "model__colsample_bytree": [0.7, 0.85, 1.0],
                     "model__min_child_weight": [1, 3, 7],
-                    # ~0.64 is the SAFE:UNSAFE ratio; 1.0 leaves the data as-is.
                     "model__scale_pos_weight": [1.0, 0.64],
                 },
                 needs_scaling=False,

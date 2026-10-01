@@ -21,8 +21,8 @@ def test_metrics_on_a_perfect_classifier() -> None:
 
 def test_metrics_count_unsafe_as_the_positive_class() -> None:
     """Recall must be measured on label 1, which this project defines as UNSAFE."""
-    y_true = np.array([1, 1, 1, 0])  # three unsafe samples
-    y_score = np.array([0.9, 0.9, 0.1, 0.1])  # one unsafe sample missed
+    y_true = np.array([1, 1, 1, 0])
+    y_score = np.array([0.9, 0.9, 0.1, 0.1])
     metrics = evaluate.classification_metrics(y_true, y_score, threshold=0.5)
     assert metrics["true_positives"] == 2
     assert metrics["false_negatives"] == 1
@@ -58,7 +58,6 @@ def test_lowering_the_threshold_cannot_reduce_recall() -> None:
 def test_select_threshold_meets_the_recall_target() -> None:
     rng = np.random.default_rng(2)
     y_true = rng.integers(0, 2, size=1000)
-    # A signal strong enough that 90% recall is reachable.
     y_score = np.clip(y_true * 0.45 + rng.normal(0.3, 0.18, size=1000), 0, 1)
     choice = evaluate.select_threshold(y_true, y_score, target_recall=0.90)
     assert choice.target_met
@@ -82,7 +81,6 @@ def test_select_threshold_prefers_the_best_precision_among_eligible() -> None:
     choice = evaluate.select_threshold(y_true, y_score, target_recall=0.85)
     sweep = evaluate.threshold_sweep(y_true, y_score, n_points=300)
     eligible = sweep[sweep["recall_unsafe"] >= 0.85]
-    # No eligible threshold should beat the chosen one on precision by a real margin.
     assert choice.achieved_precision >= eligible["precision_unsafe"].max() - 0.02
 
 
@@ -105,9 +103,6 @@ def test_threshold_sweep_is_monotonic_in_flag_rate() -> None:
     assert sweep["flag_rate"].is_monotonic_decreasing
 
 
-# --------------------------------------------------------------------------------------
-# Rule baseline
-# --------------------------------------------------------------------------------------
 def test_every_limit_cites_a_source_and_url() -> None:
     """No guideline limit may exist without a verifiable provenance."""
     for name, limit in config.PARAMETER_LIMITS.items():
@@ -127,8 +122,8 @@ def test_rule_flags_a_clear_violation() -> None:
     frame = pd.DataFrame(
         [dict.fromkeys(config.FEATURES, 0.0)],
     )
-    frame.loc[0, "ph"] = 7.0  # inside 6.5-8.5
-    frame.loc[0, "Turbidity"] = 99.0  # far above the 5 NTU permissible limit
+    frame.loc[0, "ph"] = 7.0
+    frame.loc[0, "Turbidity"] = 99.0
     assert features.rule_baseline_predict(frame)[0] == 1
 
 
@@ -159,7 +154,7 @@ def test_rule_score_is_the_fraction_of_breached_parameters() -> None:
     frame = pd.DataFrame(
         [
             {
-                "ph": 3.0,  # breach (below 6.5)
+                "ph": 3.0,
                 "Hardness": 150.0,
                 "Solids": 400.0,
                 "Chloramines": 2.0,
@@ -167,7 +162,7 @@ def test_rule_score_is_the_fraction_of_breached_parameters() -> None:
                 "Conductivity": 400.0,
                 "Organic_carbon": 10.0,
                 "Trihalomethanes": 40.0,
-                "Turbidity": 99.0,  # breach
+                "Turbidity": 99.0,
             }
         ]
     )

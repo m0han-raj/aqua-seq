@@ -73,9 +73,6 @@ def build_preprocessor(
     )
 
 
-# --------------------------------------------------------------------------------------
-# Guideline-based rule baseline
-# --------------------------------------------------------------------------------------
 def rule_violation_matrix(frame: pd.DataFrame) -> pd.DataFrame:
     """Flag, per parameter, whether each sample breaches its verified limit.
 

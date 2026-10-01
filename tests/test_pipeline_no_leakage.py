@@ -36,7 +36,6 @@ def test_median_imputer_statistics_come_from_training_data_only(
     train_medians = split.x_train[config.FEATURES].median().to_numpy()
     np.testing.assert_allclose(learned, train_medians, rtol=1e-9)
 
-    # And they must NOT equal the medians of the full dataset.
     full = pd.concat([split.x_train, split.x_test])[config.FEATURES].median().to_numpy()
     assert not np.allclose(
         learned, full
@@ -80,7 +79,6 @@ def test_extreme_test_values_cannot_influence_the_fitted_pipeline(
 
     preprocessor.transform(poisoned)
     np.testing.assert_array_equal(statistics_before, _fitted_imputer(preprocessor).statistics_)
-    # The clean transform is reproducible after the poisoned call.
     np.testing.assert_allclose(clean, preprocessor.transform(split.x_test))
 
 

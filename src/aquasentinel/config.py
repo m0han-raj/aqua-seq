@@ -12,9 +12,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
-# --------------------------------------------------------------------------------------
-# Paths (pathlib throughout so the project runs on Windows, Linux and macOS)
-# --------------------------------------------------------------------------------------
 PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[2]
 DATA_DIR: Final[Path] = PROJECT_ROOT / "data"
 RAW_DATA_DIR: Final[Path] = DATA_DIR / "raw"
@@ -25,9 +22,6 @@ RESULTS_DIR: Final[Path] = PROJECT_ROOT / "results"
 METRICS_DIR: Final[Path] = RESULTS_DIR / "metrics"
 FIGURES_DIR: Final[Path] = RESULTS_DIR / "figures"
 
-# --------------------------------------------------------------------------------------
-# Reproducibility
-# --------------------------------------------------------------------------------------
 RANDOM_SEED: Final[int] = 42
 TEST_SIZE: Final[float] = 0.20
 CV_FOLDS: Final[int] = 5
@@ -36,20 +30,12 @@ N_SEARCH_ITER: Final[int] = 40
 N_BOOTSTRAP: Final[int] = 2000
 FIGURE_DPI: Final[int] = 150
 
-# --------------------------------------------------------------------------------------
-# Label semantics -- read this before touching any metric
-# --------------------------------------------------------------------------------------
-# In the source CSV, `Potability` is encoded 1 = potable (SAFE), 0 = not potable (UNSAFE).
-# A missed UNSAFE sample is the costly error, so throughout this project we model the
-# UNSAFE class as the POSITIVE class:  y = 1 - Potability.
 RAW_TARGET: Final[str] = "Potability"
 TARGET: Final[str] = "unsafe"
-POSITIVE_LABEL: Final[int] = 1  # 1 == UNSAFE == (Potability == 0)
+POSITIVE_LABEL: Final[int] = 1
 POSITIVE_CLASS_NAME: Final[str] = "UNSAFE"
 NEGATIVE_CLASS_NAME: Final[str] = "SAFE"
 
-# Risk-aware target: the minimum recall we require on the UNSAFE class when selecting
-# the operating threshold. Among thresholds that reach it we keep the best precision.
 TARGET_UNSAFE_RECALL: Final[float] = 0.90
 
 FEATURES: Final[list[str]] = [
@@ -104,13 +90,6 @@ class ParameterLimit:
         return self.upper is not None and value > self.upper
 
 
-# --------------------------------------------------------------------------------------
-# Verified guideline limits used by the rule baseline
-# --------------------------------------------------------------------------------------
-# Each entry was checked against the cited document on 2026-10-01. Where a standard
-# publishes both an "acceptable" and a "permissible" limit we use the PERMISSIBLE
-# (outer) limit, so the rule only flags a sample when it is outside the maximum
-# allowable level rather than merely outside the desirable level.
 PARAMETER_LIMITS: Final[dict[str, ParameterLimit]] = {
     "ph": ParameterLimit(
         lower=6.5,
@@ -205,8 +184,6 @@ PARAMETER_LIMITS: Final[dict[str, ParameterLimit]] = {
     ),
 }
 
-# Parameters deliberately EXCLUDED from the rule baseline because no authoritative
-# numeric drinking-water limit could be verified for them. They are not guessed.
 UNVERIFIED_PARAMETERS: Final[dict[str, str]] = {
     "Conductivity": (
         "Neither WHO GDWQ 4th ed. Annex 3 nor BIS IS 10500:2012 publishes a numeric "

@@ -27,9 +27,9 @@ SRC = Path(__file__).resolve().parents[1] / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from scipy.stats import mannwhitneyu  # noqa: E402
-from sklearn.base import clone  # noqa: E402
-from sklearn.model_selection import (  # noqa: E402
+from scipy.stats import mannwhitneyu
+from sklearn.base import clone
+from sklearn.model_selection import (
     RandomizedSearchCV,
     RepeatedStratifiedKFold,
     StratifiedKFold,
@@ -37,7 +37,7 @@ from sklearn.model_selection import (  # noqa: E402
     cross_val_score,
 )
 
-from aquasentinel import config, data, evaluate, explain, features, models, report  # noqa: E402
+from aquasentinel import config, data, evaluate, explain, features, models, report
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -70,9 +70,6 @@ def log(message: str) -> None:
     print(f"[aquasentinel] {message}", flush=True)
 
 
-# --------------------------------------------------------------------------------------
-# Step 1-2: audit and EDA
-# --------------------------------------------------------------------------------------
 def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
     """Produce the data-audit and EDA artefacts.
 
@@ -87,7 +84,6 @@ def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
     feature_frame = raw[config.FEATURES]
     missing = data.missingness_report(raw)
 
-    # Is missingness related to the target or to other features?
     missing_vs_target = {}
     for column in missing[missing["n_missing"] > 0].index:
         flag = raw[column].isna()
@@ -101,13 +97,11 @@ def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
             "mannwhitney_p": float(p_value),
         }
 
-    # Statistical tests: each feature against the target, with rank-biserial effect size.
     tests = []
     for column in config.FEATURES:
         unsafe_values = feature_frame.loc[target == 1, column].dropna()
         safe_values = feature_frame.loc[target == 0, column].dropna()
         statistic, p_value = mannwhitneyu(unsafe_values, safe_values, alternative="two-sided")
-        # Rank-biserial correlation: 2*AUC - 1, bounded [-1, 1]; 0 means no separation.
         auc = statistic / (len(unsafe_values) * len(safe_values))
         tests.append(
             {
@@ -129,7 +123,6 @@ def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
     summary_stats.index.name = "feature"
     write_csv(summary_stats.round(4), "eda_summary_statistics", index=True)
 
-    # Figures
     evaluate.plot_target_balance(target, "01_target_balance")
     evaluate.plot_missingness(missing, "02_missingness")
     evaluate.plot_feature_distributions(
@@ -163,9 +156,6 @@ def run_audit_and_eda(raw: pd.DataFrame) -> dict[str, Any]:
     return audit
 
 
-# --------------------------------------------------------------------------------------
-# Step 3: rule baseline
-# --------------------------------------------------------------------------------------
 def run_rule_baseline(raw: pd.DataFrame) -> dict[str, Any]:
     """Evaluate the guideline-based rule baseline and record which limits fire."""
     log("Step 3: guideline-based rule baseline")
@@ -199,9 +189,6 @@ def run_rule_baseline(raw: pd.DataFrame) -> dict[str, Any]:
     return payload
 
 
-# --------------------------------------------------------------------------------------
-# Steps 4-6: split, leakage-safe CV, tuning
-# --------------------------------------------------------------------------------------
 def run_modeling(split: data.SplitData) -> dict[str, Any]:
     """Tune every candidate model with CV on the training set only."""
     log("Steps 4-6: cross-validated tuning (training set only)")
@@ -217,7 +204,6 @@ def run_modeling(split: data.SplitData) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     fitted: dict[str, Any] = {}
 
-    # --- Baseline 1: majority-class dummy -------------------------------------------
     dummy = models.build_dummy_classifier()
     dummy_scores = cross_val_score(
         dummy, split.x_train, split.y_train, cv=report_cv, scoring="roc_auc", n_jobs=-1
@@ -233,7 +219,6 @@ def run_modeling(split: data.SplitData) -> dict[str, Any]:
     )
     fitted["Dummy (majority class)"] = clone(dummy).fit(split.x_train, split.y_train)
 
-    # --- Baseline 2: guideline rule, scored through the same CV folds ----------------
     rule_aucs, rule_aps = [], []
     for _, valid_idx in report_cv.split(split.x_train, split.y_train):
         x_valid = split.x_train.iloc[valid_idx]
@@ -252,7 +237,6 @@ def run_modeling(split: data.SplitData) -> dict[str, Any]:
         }
     )
 
-    # --- Candidate models ------------------------------------------------------------
     for spec in models.build_model_specs():
         started = time.time()
         log(f"  tuning {spec.name} ({config.N_SEARCH_ITER} candidates x {config.CV_FOLDS} folds)")
@@ -269,7 +253,6 @@ def run_modeling(split: data.SplitData) -> dict[str, Any]:
         )
         search.fit(split.x_train, split.y_train)
 
-        # Re-score the chosen configuration under the richer repeated CV.
         scores = cross_val_score(
             clone(search.best_estimator_),
             split.x_train,
@@ -348,9 +331,6 @@ def run_imputer_comparison(split: data.SplitData) -> pd.DataFrame:
     return frame
 
 
-# --------------------------------------------------------------------------------------
-# Step 7: threshold selection and the single final test evaluation
-# --------------------------------------------------------------------------------------
 def run_final_evaluation(
     split: data.SplitData, leaderboard: pd.DataFrame, fitted: dict[str, Any]
 ) -> dict[str, Any]:
@@ -360,7 +340,6 @@ def run_final_evaluation(
     best_pipeline = fitted[best_name]
     log(f"  best model by CV ROC-AUC: {best_name}")
 
-    # --- Threshold chosen on cross-validated TRAINING predictions only ---------------
     cv = StratifiedKFold(n_splits=config.CV_FOLDS, shuffle=True, random_state=config.RANDOM_SEED)
     oof_scores = cross_val_predict(
         clone(best_pipeline),
@@ -379,7 +358,6 @@ def run_final_evaluation(
         f"(CV recall {choice.achieved_recall:.3f}, precision {choice.achieved_precision:.3f})"
     )
 
-    # --- Retrain on the full training set, then touch the test set exactly once ------
     final_model = clone(best_pipeline).fit(split.x_train, split.y_train)
     test_scores = final_model.predict_proba(split.x_test)[:, 1]
 
@@ -387,7 +365,6 @@ def run_final_evaluation(
     at_default = evaluate.classification_metrics(split.y_test, test_scores, 0.5)
     cis = evaluate.bootstrap_metric_cis(split.y_test, test_scores, choice.threshold)
 
-    # --- Baselines on the same test set ----------------------------------------------
     rule_scores = features.rule_baseline_score(split.x_test)
     rule_pred = features.rule_baseline_predict(split.x_test)
     rule_metrics = evaluate.classification_metrics(split.y_test, rule_scores, 1e-9)
@@ -399,7 +376,6 @@ def run_final_evaluation(
     dummy_scores = dummy_pipeline.predict_proba(split.x_test)[:, 1]
     dummy_metrics = evaluate.classification_metrics(split.y_test, dummy_scores, 0.5)
 
-    # --- Curves, confusion matrix, calibration ---------------------------------------
     curves = {
         name: (split.y_test, fitted[name].predict_proba(split.x_test)[:, 1])
         for name in leaderboard[leaderboard["kind"] == "model"]["model"]
@@ -415,8 +391,6 @@ def run_final_evaluation(
     )
     evaluate.plot_calibration(split.y_test, test_scores, best_name, "10_calibration")
 
-    # Persist the exact test-set predictions so notebooks and any downstream analysis
-    # read the real numbers instead of refitting the model and risking silent drift.
     write_csv(
         pd.DataFrame(
             {
@@ -455,9 +429,6 @@ def run_final_evaluation(
     }
 
 
-# --------------------------------------------------------------------------------------
-# Step 8-9: explainability and error analysis
-# --------------------------------------------------------------------------------------
 def run_explainability(final: dict[str, Any], split: data.SplitData) -> dict[str, Any]:
     """Permutation importance and SHAP for the final model."""
     log("Step 8: explainability")

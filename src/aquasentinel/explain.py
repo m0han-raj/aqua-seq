@@ -65,7 +65,7 @@ def _transformed_frame(pipeline: Pipeline, x: pd.DataFrame) -> pd.DataFrame:
     matrix = preprocessor.transform(x)
     try:
         names = list(preprocessor.get_feature_names_out())
-    except (AttributeError, ValueError):  # pragma: no cover - defensive
+    except (AttributeError, ValueError):
         names = [f"f{i}" for i in range(matrix.shape[1])]
     return pd.DataFrame(matrix, columns=names, index=x.index)
 
@@ -89,7 +89,7 @@ def shap_summary(
     """
     try:
         import shap
-    except ImportError:  # pragma: no cover
+    except ImportError:
         return None
 
     model = pipeline.named_steps["model"]
@@ -99,12 +99,11 @@ def shap_summary(
     try:
         explainer = shap.TreeExplainer(model)
         values = explainer.shap_values(transformed)
-    except Exception:  # pragma: no cover - model type not supported by TreeExplainer
+    except Exception:
         return None
 
     values = np.asarray(values)
     if values.ndim == 3:
-        # (n_samples, n_features, n_classes) or (n_classes, n_samples, n_features)
         values = values[:, :, 1] if values.shape[-1] == 2 else values[1]
     return values, transformed
 

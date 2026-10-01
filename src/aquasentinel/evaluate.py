@@ -36,18 +36,15 @@ from sklearn.metrics import (
 
 from . import config
 
-# --------------------------------------------------------------------------------------
-# Styling -- validated categorical palette, fixed slot order, never cycled
-# --------------------------------------------------------------------------------------
 SERIES_COLORS: tuple[str, ...] = (
-    "#2a78d6",  # 1 blue
-    "#eb6834",  # 2 orange
-    "#1baf7a",  # 3 aqua
-    "#eda100",  # 4 yellow
-    "#e87ba4",  # 5 magenta
-    "#008300",  # 6 green
-    "#4a3aa7",  # 7 violet
-    "#e34948",  # 8 red
+    "#2a78d6",
+    "#eb6834",
+    "#1baf7a",
+    "#eda100",
+    "#e87ba4",
+    "#008300",
+    "#4a3aa7",
+    "#e34948",
 )
 SURFACE = "#fcfcfb"
 INK_PRIMARY = "#0b0b0b"
@@ -110,9 +107,6 @@ def save_figure(fig: plt.Figure, name: str) -> Path:
     return path
 
 
-# --------------------------------------------------------------------------------------
-# Metrics
-# --------------------------------------------------------------------------------------
 @dataclass(frozen=True)
 class ThresholdChoice:
     """The outcome of risk-aware threshold selection.
@@ -195,7 +189,6 @@ def select_threshold(
     """
     y_true = np.asarray(y_true).astype(int)
     precision, recall, thresholds = precision_recall_curve(y_true, y_score)
-    # precision_recall_curve returns one more point than thresholds; drop the last.
     precision, recall = precision[:-1], recall[:-1]
 
     eligible = recall >= target_recall
@@ -301,9 +294,6 @@ def threshold_sweep(
     return pd.DataFrame(rows)
 
 
-# --------------------------------------------------------------------------------------
-# Figures
-# --------------------------------------------------------------------------------------
 def plot_roc_curves(curves: dict[str, tuple[np.ndarray, np.ndarray]], name: str) -> Path:
     """Plot ROC curves for several models on one axis.
 
